@@ -9,7 +9,7 @@
 $admin_email = "1579527706@qq.com";  // ← 请修改这里
 
 // 感谢页面路径
-$thank_you_page = "https://y1inq1ng.github.io/wfweb/wf_web/thank_you.html";
+$thank_you_page = "wf_web/thank_you.html";
 
 // 是否开启调试模式（true显示错误详情，上线后改为false）
 $debug_mode = true;
