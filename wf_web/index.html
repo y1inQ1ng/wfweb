@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文峰所外来人员采集登记</title>
+    <style>
+        :root {
+            --primary-color: #2E86C1;
+            --secondary-color: #5D6D7E;
+            --accent-color: #F39C12;
+            --error-color: #E74C3C;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --border-radius: 6px;
+            --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        #questionnaire {
+            background-color: white;
+            padding: 30px;
+            margin: 0 auto;
+            max-width: 800px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        hr {
+            width: 80%;
+            border: none;
+            height: 1px;
+            background-color: rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+        }
+        
+        form {
+            width: 90%;
+            margin: 0 auto;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .question:last-child {
+            border-bottom: none;
+        }
+        
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .required:before {
+            content: "* ";
+            color: var(--error-color);
+        }
+        
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(46, 134, 193, 0.2);
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            display: block;
+            margin: 30px auto 0;
+        }
+        
+        button:hover {
+            background-color: #2874A6;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            #questionnaire {
+                padding: 20px;
+                width: 95%;
+            }
+            
+            form {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="questionnaire">
+        <h1>文峰所外来人员采集登记</h1>
+        <hr />
+        <form method="post" action="submit.php" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <!-- 问题1: 房屋号码 -->
+            <div class="question">
+                <div class="question-text required">房屋号码</div>
+                <input type="text" name="houseNumber" required placeholder="请输入房屋号码">
+                <div class="error-message" id="houseNumber-error">请输入房屋号码</div>
+            </div>
+            
+            <!-- 问题2: 姓名 -->
+            <div class="question">
+                <div class="question-text required">姓名</div>
+                <input type="text" name="name" required placeholder="请输入姓名">
+                <div class="error-message" id="name-error">请输入姓名</div>
+            </div>
+            
+            <!-- 问题3: 身份证号码 -->
+            <div class="question">
+                <div class="question-text required">身份证号码</div>
+                <input type="text" name="idNumber" required placeholder="请输入18位身份证号码" 
+                       pattern="\d{17}[\dXx]|[0-9]{18}" 
+                       title="请输入18位有效身份证号码，最后一位可以是数字或X">
+                <div class="error-message" id="idNumber-error">请输入18位有效身份证号码，最后一位可以是数字或X</div>
+            </div>
+            
+            <!-- 问题4: 联系电话 -->
+            <div class="question">
+                <div class="question-text required">联系电话</div>
+                <input type="tel" name="phone" required placeholder="请输入11位联系电话" pattern="\d{11}">
+                <div class="error-message" id="phone-error">请输入11位有效联系电话</div>
+            </div>
+            
+            <!-- 问题5: 实际居住情况 -->
+            <div class="question">
+                <div class="question-text required">实际居住情况</div>
+                <div class="options-container">
+                    <div class="option-item">
+                        <label>
+                            <input type="radio" name="livingCondition" value="个人自购（自建）房" required>
+                            个人自购（自建）房
+                        </label>
+                    </div>
+                    <div class="option-item">
+                        <label>
+                            <input type="radio" name="livingCondition" value="亲属自购（自建）房屋" required>
+                            亲属自购（自建）房屋
+                        </label>
+                    </div>
+                    <div class="option-item">
+                        <label>
+                            <input type="radio" name="livingCondition" value="单位宿舍" required>
+                            单位宿舍
+                        </label>
+                    </div>
+                    <div class="option-item">
+                        <label>
+                            <input type="radio" name="livingCondition" value="个人出租房屋" required>
+                            个人出租房屋
+                        </label>
+                    </div>
+                    <div class="option-item">
+                        <label>
+                            <input type="radio" name="livingCondition" value="集体租住房屋" required>
+                            集体租住房屋
+                        </label>
+                    </div>
+                </div>
+                <div class="error-message" id="livingCondition-error">请选择实际居住情况</div>
+            </div>
+            
+            <!-- 问题6: 工作单位和地址 -->
+            <div class="question">
+                <div class="question-text required">工作单位和地址</div>
+                <input type="text" name="workAddress" required placeholder="请输入工作单位和地址">
+                <div class="error-message" id="workAddress-error">请输入工作单位和地址</div>
+            </div>
+            
+            <!-- 问题7: 采集照片 -->
+            <div class="question">
+                <div class="question-text required">采集照片</div>
+                <input type="file" name="photo" accept="image/*" required>
+                <div class="error-message" id="photo-error">请上传照片</div>
+            </div>
+            
+            <!-- 问题8: 出租房主联系方式、姓名、身份证号码 -->
+            <div class="question">
+                <div class="question-text">出租房主联系方式、姓名、身份证号码</div>
+                <input type="text" name="landlordInfo" placeholder="请输入出租房主信息（非必填）">
+            </div>
+            
+            <!-- 问题9: 是否宣防 -->
+            <div class="question">
+                <div class="question-text required">是否宣防</div>
+                <div class="options-container">
+                    <div class="option-item">
+                        <label>
+                            <input type="radio" name="securityPropaganda" value="是" required>
+                            是
+                        </label>
+                    </div>
+                    <div class="option-item">
+                        <label>
+                            <input type="radio" name="securityPropaganda" value="否" required>
+                            否
+                        </label>
+                    </div>
+                </div>
+                <div class="error-message" id="securityPropaganda-error">请选择是否宣防</div>
+            </div>
+            
+            <!-- 问题10: 是否自主申报 -->
+            <div class="question">
+                <div class="question-text required">是否自主申报</div>
+                <div class="options-container">
+                    <div class="option-item">
+                        <label>
+                            <input type="radio" name="selfReport" value="是" required>
+                            是
+                        </label>
+                    </div>
+                    <div class="option-item">
+                        <label>
+                            <input type="radio" name="selfReport" value="否" required>
+                            否
+                        </label>
+                    </div>
+                </div>
+                <div class="error-message" id="selfReport-error">请选择是否自主申报</div>
+            </div>
+            
+            <!-- 问题11: 房屋性质 -->
+            <div class="question">
+                <div class="question-text required">房屋性质</div>
+                <div class="options-container">
+                    <div class="option-item">
+                        <label>
+                            <input type="radio" name="houseType" value="商品房" required>
+                            商品房
+                        </label>
+                    </div>
+                    <div class="option-item">
+                        <label>
+                            <input type="radio" name="houseType" value="房改房" required>
+                            房改房
+                        </label>
+                    </div>
+                    <div class="option-item">
+                        <label>
+                            <input type="radio" name="houseType" value="集资房" required>
+                            集资房
+                        </label>
+                    </div>
+                </div>
+                <div class="error-message" id="houseType-error">请选择房屋性质</div>
+            </div>
+            
+            <button type="submit">提交登记</button>
+        </form>
+    </div>
+
+    <script>
+        function validateForm() {
+            let isValid = true;
+            
+            // 验证必填文本输入
+            const requiredTextInputs = [
+                { name: 'houseNumber', errorId: 'houseNumber-error' },
+                { name: 'name', errorId: 'name-error' },
+                { name: 'workAddress', errorId: 'workAddress-error' }
+            ];
+            
+            requiredTextInputs.forEach(input => {
+                const element = document.querySelector(`input[name="${input.name}"]`);
+                const errorElement = document.getElementById(input.errorId);
+                
+                if (!element.value.trim()) {
+                    errorElement.style.display = 'block';
+                    isValid = false;
+                } else {
+                    errorElement.style.display = 'none';
+                }
+            });
+            
+            // 验证身份证号码（支持最后一位为X或x）
+            const idNumberInput = document.querySelector('input[name="idNumber"]');
+            const idNumberError = document.getElementById('idNumber-error');
+            if (!/^\d{17}[\dXx]$|^\d{18}$/.test(idNumberInput.value.trim())) {
+                idNumberError.style.display = 'block';
+                isValid = false;
+            } else {
+                idNumberError.style.display = 'none';
+            }
+            
+            // 验证联系电话
+            const phoneInput = document.querySelector('input[name="phone"]');
+            const phoneError = document.getElementById('phone-error');
+            if (!/^\d{11}$/.test(phoneInput.value.trim())) {
+                phoneError.style.display = 'block';
+                isValid = false;
+            } else {
+                phoneError.style.display = 'none';
+            }
+            
+            // 验证单选问题
+            const radioGroups = [
+                'livingCondition', 
+                'securityPropaganda', 
+                'selfReport', 
+                'houseType'
+            ];
+            
+            radioGroups.forEach(group => {
+                const selected = document.querySelector(`input[name="${group}"]:checked`);
+                const errorElement = document.getElementById(`${group}-error`);
+                
+                if (!selected) {
+                    errorElement.style.display = 'block';
+                    isValid = false;
+                } else {
+                    errorElement.style.display = 'none';
+                }
+            });
+            
+            // 验证照片上传
+            const photoInput = document.querySelector('input[name="photo"]');
+            const photoError = document.getElementById('photo-error');
+            if (!photoInput.files || photoInput.files.length === 0) {
+                photoError.style.display = 'block';
+                isValid = false;
+            } else {
+                // 检查文件类型
+                const file = photoInput.files[0];
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!allowedTypes.includes(file.type)) {
+                    photoError.textContent = '只允许上传JPG/PNG图片';
+                    photoError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    photoError.style.display = 'none';
+                }
+            }
+            
+            if (!isValid) {
+                // 滚动到第一个错误处
+                const firstError = document.querySelector('.error-message[style="display: block;"]');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+            
+            return isValid;
+        }
+        
+        // 实时验证输入
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.name === 'idNumber') {
+                    const errorElement = document.getElementById('idNumber-error');
+                    if (/^\d{17}[\dXx]$|^\d{18}$/.test(this.value.trim())) {
+                        errorElement.style.display = 'none';
+                    }
+                } else if (this.name === 'phone') {
+                    const errorElement = document.getElementById('phone-error');
+                    if (/^\d{11}$/.test(this.value.trim())) {
+                        errorElement.style.display = 'none';
+                    }
+                } else if (this.type === 'text' && this.value.trim()) {
+                    const errorId = `${this.name}-error`;
+                    const errorElement = document.getElementById(errorId);
+                    if (errorElement) {
+                        errorElement.style.display = 'none';
+                    }
+                }
+            });
+            
+            if (this.type === 'radio') {
+                input.addEventListener('change', function() {
+                    const groupName = this.name;
+                    const errorElement = document.getElementById(`${groupName}-error`);
+                    if (errorElement) {
+                        errorElement.style.display = 'none';
+                    }
+                });
+            }
+        });
+        
+        // 照片上传验证
+        document.querySelector('input[name="photo"]').addEventListener('change', function() {
+            const errorElement = document.getElementById('photo-error');
+            if (this.files && this.files.length > 0) {
+                const file = this.files[0];
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (allowedTypes.includes(file.type)) {
+                    errorElement.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
